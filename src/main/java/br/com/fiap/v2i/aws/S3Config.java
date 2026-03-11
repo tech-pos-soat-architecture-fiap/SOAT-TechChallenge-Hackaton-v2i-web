@@ -22,6 +22,7 @@ public class S3Config {
 
     @Value("${aws.secret-access-key}")
     private String secretAccessKey;
+
     @Value("${aws.s3.endpoint}")
     private String endpoint;
 

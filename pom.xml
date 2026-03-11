@@ -59,34 +59,10 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- AWS SDK v2 -->
-<!--        <dependency>-->
-<!--            <groupId>software.amazon.awssdk</groupId>-->
-<!--            <artifactId>cloudformation</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>software.amazon.awssdk.crt</groupId>-->
-<!--            <artifactId>aws-crt</artifactId>-->
-<!--            <version>0.38.13</version>-->
-<!--        </dependency>-->
+
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>software.amazon.awssdk</groupId>-->
-<!--            <artifactId>apache-client</artifactId>-->
-<!--        </dependency>-->
-<!-- -->
-<!--        <dependency>-->
-<!--            <groupId>software.amazon.awssdk</groupId>-->
-<!--            <artifactId>netty-nio-client</artifactId>-->
-<!--        </dependency>-->
-
-        <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
