@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hackaton-configmap-v1
+  labels:
+    app: hackaton-configmap-v1
+    component: config
+    version: v1
+data:
+  SERVER_PORT: "8000"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://${HOST_IP}:5432/v2i"
