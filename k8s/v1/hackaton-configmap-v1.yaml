@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hackaton-configmap-v1
+  name: v2i-web-configmap-v1
   labels:
-    app: hackaton-configmap-v1
+    app: v2i-web-configmap-v1
     component: config
     version: v1
 data:

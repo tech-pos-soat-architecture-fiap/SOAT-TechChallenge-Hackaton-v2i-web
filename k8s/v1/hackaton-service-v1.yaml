@@ -4,7 +4,7 @@ metadata:
   name: v2i-web-service-v1
 spec:
   selector:
-    app: hackaton
+    app: v2i-web
   ports:
     - port: 80
       targetPort: 8000

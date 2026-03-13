@@ -9,23 +9,23 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hackaton
+      app: v2i-web
   template:
     metadata:
       labels:
-        app: hackaton
+        app: v2i-web
     spec:
       containers:
         - name: v2i-web
-          image: hackaton-v2i-web:v2
+          image: hackaton-v2i-web:v3
           imagePullPolicy: Never
           ports:
             - containerPort: 8000
           envFrom:
             - configMapRef:
-                name: hackaton-configmap-v1
+                name: v2i-web-configmap-v1
             - secretRef:
-                name: hackaton-db-secret-v1
+                name: v2i-web-db-secret-v1
           resources:
             requests:
               memory: "256Mi"

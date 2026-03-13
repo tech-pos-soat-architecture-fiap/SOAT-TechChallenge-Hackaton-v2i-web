@@ -18,11 +18,11 @@ fi
 # Criar imagem docker
 echo "🔨 Criando imagem docker..."
 cd ../../  # Volta para a raiz onde está o Dockerfile
-docker build --no-cache -t hackaton-v2i-web:v2 .
+docker build --no-cache -t hackaton-v2i-web:v3 .
 
 # Copiar imagem para o minikube
 echo "📦 Copiando imagem para o minikube..."
-minikube image load hackaton-v2i-web:v2
+minikube image load hackaton-v2i-web:v3
 
 # Volta para a pasta dos manifestos
 cd k8s/v1
@@ -53,7 +53,7 @@ kubectl apply -f hackaton-hpa-v1.yaml
 kubectl apply -f hackaton-deployment-v1.yaml
 
 echo -e "\n${YELLOW}⏳ Aguardando pods...${NC}"
-kubectl rollout status deployment/v2i-web --timeout=180s
+kubectl rollout status deployment/v2i-web-deployment-v1 --timeout=180s
 
 MINIKUBE_IP=$(minikube ip)
 
