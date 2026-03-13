@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hackaton-deployment-v1
+  name: v2i-web-deployment-v1
   labels:
-    app: hackaton-deployment-v1
+    app: v2i-web-deployment-v1
     version: v1
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
         app: hackaton
     spec:
       containers:
-        - name: hackaton
-          image: hackaton:v4
+        - name: v2i-web
+          image: hackaton-v2i-web:v2
           imagePullPolicy: Never
           ports:
             - containerPort: 8000
