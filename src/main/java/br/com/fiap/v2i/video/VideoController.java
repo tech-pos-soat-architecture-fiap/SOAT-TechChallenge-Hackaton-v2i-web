@@ -10,6 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/video")
 public class VideoController {
@@ -65,5 +67,18 @@ public class VideoController {
         videoRepository.save(video);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<VideoStatusResponse>> listMyVideos(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(NotFoundException::new);
+
+        List<VideoStatusResponse> videos = videoRepository.findByUser(user)
+                .stream()
+                .map(VideoStatusResponse::fromEntity)
+                .toList();
+
+        return ResponseEntity.ok(videos);
     }
 }
