@@ -5,6 +5,12 @@ public class UploadInitiateRequest {
     private String contentType;
     private long fileSize;
 
+    public UploadInitiateRequest(String filename, String contentType, long fileSize) {
+        this.filename = filename;
+        this.contentType = contentType;
+        this.fileSize = fileSize;
+    }
+
     public String getFilename() {
         return filename;
     }
