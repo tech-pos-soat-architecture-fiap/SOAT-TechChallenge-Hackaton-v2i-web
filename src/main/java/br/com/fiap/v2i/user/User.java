@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-//TODO talvez precise adicionar mais atributos aqui
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
