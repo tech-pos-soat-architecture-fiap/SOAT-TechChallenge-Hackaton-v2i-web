@@ -18,11 +18,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/video/upload").authenticated()
                         .requestMatchers("/api/videos/user/**").authenticated()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults());
 
         return http.build();
     }
