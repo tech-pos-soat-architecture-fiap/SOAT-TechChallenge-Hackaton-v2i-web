@@ -4,6 +4,7 @@ import br.com.fiap.v2i.aws.PresignedUrlResponse;
 import br.com.fiap.v2i.aws.S3Service;
 import br.com.fiap.v2i.user.User;
 import br.com.fiap.v2i.user.UserRepository;
+import br.com.fiap.v2i.utils.NotFoundException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +34,7 @@ public class VideoController {
                 request.getFileSize()
         );
 
-        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(ChangeSetPersister.NotFoundException::new);
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(NotFoundException::new);
 
         Video video = Video.createAsUploaded(user, request.getFilename());
         videoRepository.save(video);
