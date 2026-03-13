@@ -20,6 +20,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/video/upload").authenticated()
                         .requestMatchers("/api/videos/user/**").authenticated()
                         .anyRequest().authenticated()
