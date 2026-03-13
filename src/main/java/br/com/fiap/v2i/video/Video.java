@@ -28,6 +28,26 @@ public class Video {
         this.status = status;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public VideoStatus getStatus() {
+        return status;
+    }
+
     public static Video createAsUploaded(User user, String fileName, String fileHash) {
         return new Video(user, fileName, fileHash, VideoStatus.UPLOADED);
     }
