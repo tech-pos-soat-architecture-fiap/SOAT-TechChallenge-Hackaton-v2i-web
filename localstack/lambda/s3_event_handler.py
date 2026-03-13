@@ -2,7 +2,8 @@ import json
 import os
 import requests
 
-PROCESSING_APP_URL = os.environ.get("PROCESSING_APP_URL", "http://v2i-processing:8080/api/video/process")
+PROCESSING_APP_URL = os.environ.get("PROCESSING_APP_URL", "http://192.168.18.8:30001/extract-frames")
+S3_ENDPOINT = os.environ.get("S3_ENDPOINT", "http://localhost:4566")
 
 
 def handler(event, context):
@@ -20,7 +21,8 @@ def handler(event, context):
 
 
 def _send_to_processing_app(bucket: str, key: str):
-    payload = {"bucket": bucket, "key": key}
+    file_url = f"{S3_ENDPOINT}/{bucket}/{key}"
+    payload = {"bucket": bucket, "key": key, "file_url": file_url}
 
     try:
         response = requests.post(PROCESSING_APP_URL, json=payload, timeout=10)
