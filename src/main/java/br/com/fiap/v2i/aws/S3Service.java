@@ -27,7 +27,8 @@ public class S3Service {
             String contentType,
             long fileSize) {
 
-        String key = "uploads/" + UUID.randomUUID() + "/" + filename;
+        UUID uuid = UUID.randomUUID();
+        String key = "uploads/" + uuid + "/" + filename;
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -37,7 +38,7 @@ public class S3Service {
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(15)) // Short expiration for security
+                .signatureDuration(Duration.ofMinutes(15))
                 .putObjectRequest(putObjectRequest)
                 .build();
 
@@ -45,7 +46,8 @@ public class S3Service {
 
         return new PresignedUrlResponse(
                 presignedRequest.url().toString(),
-                key
+                key,
+                uuid.toString()
         );
     }
 

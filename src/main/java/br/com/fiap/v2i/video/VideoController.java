@@ -36,7 +36,7 @@ public class VideoController {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(NotFoundException::new);
 
-        Video video = Video.createAsUploaded(user, request.getFilename());
+        Video video = Video.createAsUploaded(user, request.getFilename(), response.getKey());
         videoRepository.save(video);
 
         return ResponseEntity.ok(response);

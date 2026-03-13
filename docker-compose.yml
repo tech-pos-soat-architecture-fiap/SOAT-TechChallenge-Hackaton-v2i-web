@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
-      POSTGRES_DB: TechFood
+      POSTGRES_DB: v2i
     profiles:
       - dev
       - prod
@@ -36,7 +36,6 @@ services:
 
   localstack:
     image: localstack/localstack:4.13.1
-    container_name: localstack
     ports:
       - "4566:4566"
     environment:
