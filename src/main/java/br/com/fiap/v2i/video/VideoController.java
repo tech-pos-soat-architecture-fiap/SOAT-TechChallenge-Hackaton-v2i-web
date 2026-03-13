@@ -42,8 +42,8 @@ public class VideoController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/processing/{videoHash}")
-    public ResponseEntity<Void> markAsProcessing(@PathVariable String videoHash) {
+    @PostMapping("/processing")
+    public ResponseEntity<Void> markAsProcessing(@RequestBody String videoHash) {
         Video video = videoRepository.findByHash(videoHash).orElseThrow(NotFoundException::new);
         video.markAsProcessing();
         videoRepository.save(video);
@@ -51,8 +51,8 @@ public class VideoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/complete/{videoHash}")
-    public ResponseEntity<Void> markAsComplete(@PathVariable String videoHash) {
+    @PostMapping("/complete")
+    public ResponseEntity<Void> markAsComplete(@RequestBody String videoHash) {
         Video video = videoRepository.findByHash(videoHash).orElseThrow(NotFoundException::new);
         video.markAsComplete();
         videoRepository.save(video);
@@ -60,8 +60,8 @@ public class VideoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/error/{videoHash}")
-    public ResponseEntity<Void> markAsError(@PathVariable String videoHash) {
+    @PostMapping("/error")
+    public ResponseEntity<Void> markAsError(@RequestBody String videoHash) {
         Video video = videoRepository.findByHash(videoHash).orElseThrow(NotFoundException::new);
         video.markAsError();
         videoRepository.save(video);

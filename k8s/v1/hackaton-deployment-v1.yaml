@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: v2i-web
-          image: hackaton-v2i-web:v4
+          image: hackaton-v2i-web:v6
           imagePullPolicy: Never
           ports:
             - containerPort: 8000

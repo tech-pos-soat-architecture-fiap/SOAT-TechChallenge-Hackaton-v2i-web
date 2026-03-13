@@ -40,7 +40,6 @@ awslocal lambda create-function \
   --handler s3_event_handler.handler \
   --zip-file "fileb://${LAMBDA_ZIP}" \
   --region "${REGION}" \
-  --environment "Variables={PROCESSING_APP_URL=http://v2i-processing:8080/api/video/process}" \
   --timeout 30 >/dev/null
 
 log "Waiting for Lambda to become active..."
@@ -62,3 +61,4 @@ awslocal s3api put-bucket-notification-configuration \
   --notification-configuration "{\"LambdaFunctionConfigurations\":[{\"LambdaFunctionArn\":\"arn:aws:lambda:${REGION}:${ACCOUNT_ID}:function:${LAMBDA_NAME}\",\"Events\":[\"s3:ObjectCreated:*\"],\"Filter\":{\"Key\":{\"FilterRules\":[{\"Name\":\"prefix\",\"Value\":\"uploads/\"}]}}}]}" >/dev/null
 
 log "Setup complete!"
+

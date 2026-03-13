@@ -24,12 +24,13 @@ services:
       - db
 
   rabbitmq:
-    image: 'rabbitmq:latest'
+    image: 'rabbitmq:3.13-management-alpine'
     environment:
       - 'RABBITMQ_DEFAULT_PASS=root'
       - 'RABBITMQ_DEFAULT_USER=root'
     ports:
       - "5672:5672"
+      - "15672:15672"
     profiles:
       - dev
       - prod
@@ -47,6 +48,8 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - LAMBDA_DOCKER_FLAGS="--add-host=host.docker.internal:host-gateway"
       - EXTRA_CORS_ALLOWED_ORIGINS=*
+      - PROCESSING_APP_URL=http://host.docker.internal:18000/extract-frames
+      - S3_ENDPOINT=http://host.docker.internal:4566
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

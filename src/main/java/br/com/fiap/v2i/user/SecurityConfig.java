@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/video/upload").authenticated()
                         .requestMatchers("/api/videos/user/**").authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
