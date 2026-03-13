@@ -5,7 +5,6 @@ import br.com.fiap.v2i.aws.S3Service;
 import br.com.fiap.v2i.user.User;
 import br.com.fiap.v2i.user.UserRepository;
 import br.com.fiap.v2i.utils.NotFoundException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,8 +25,7 @@ public class VideoController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<PresignedUrlResponse> initiateUpload(@RequestBody UploadInitiateRequest request, @AuthenticationPrincipal UserDetails userDetails) throws ChangeSetPersister.NotFoundException {
-
+    public ResponseEntity<PresignedUrlResponse> initiateUpload(@RequestBody UploadInitiateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         PresignedUrlResponse response = s3Service.generatePresignedUrl(
                 request.getFilename(),
                 request.getContentType(),
@@ -40,5 +38,32 @@ public class VideoController {
         videoRepository.save(video);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/processing/{videoHash}")
+    public ResponseEntity<Void> markAsProcessing(@PathVariable String videoHash) {
+        Video video = videoRepository.findByHash(videoHash).orElseThrow(NotFoundException::new);
+        video.markAsProcessing();
+        videoRepository.save(video);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/complete/{videoHash}")
+    public ResponseEntity<Void> markAsComplete(@PathVariable String videoHash) {
+        Video video = videoRepository.findByHash(videoHash).orElseThrow(NotFoundException::new);
+        video.markAsComplete();
+        videoRepository.save(video);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/error/{videoHash}")
+    public ResponseEntity<Void> markAsError(@PathVariable String videoHash) {
+        Video video = videoRepository.findByHash(videoHash).orElseThrow(NotFoundException::new);
+        video.markAsError();
+        videoRepository.save(video);
+
+        return ResponseEntity.ok().build();
     }
 }

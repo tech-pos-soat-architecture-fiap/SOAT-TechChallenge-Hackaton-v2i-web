@@ -31,4 +31,16 @@ public class Video {
     public static Video createAsUploaded(User user, String fileName, String fileHash) {
         return new Video(user, fileName, fileHash, VideoStatus.UPLOADED);
     }
+
+    public void markAsProcessing() {
+        this.status = VideoStatus.PROCESSING;
+    }
+
+    public void markAsComplete() {
+        this.status = VideoStatus.COMPLETED;
+    }
+
+    public void markAsError() {
+        this.status = VideoStatus.ERROR;
+    }
 }
