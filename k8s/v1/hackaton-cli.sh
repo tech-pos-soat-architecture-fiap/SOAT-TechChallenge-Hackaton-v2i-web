@@ -18,11 +18,11 @@ fi
 # Criar imagem docker
 echo "🔨 Criando imagem docker..."
 cd ../../  # Volta para a raiz onde está o Dockerfile
-docker build --no-cache -t hackaton-v2i-web:v3 .
+docker build --no-cache -t hackaton-v2i-web:v4 .
 
 # Copiar imagem para o minikube
 echo "📦 Copiando imagem para o minikube..."
-minikube image load hackaton-v2i-web:v3
+minikube image load hackaton-v2i-web:v4
 
 # Volta para a pasta dos manifestos
 cd k8s/v1
