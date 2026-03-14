@@ -50,13 +50,13 @@ graph TD
     WebAPI -- Upload Video --> S3
     WebAPI -- Metadados (Pendente) --> Postgres
     
-    %% Fluxo de Trigger (Event Driven)
-    S3 -.-> |Evento Upload|
+    %% Fluxo de Trigger (Event Driven) - LINHA CORRIGIDA ABAIXO
+    S3 -.-> |Evento Upload| Worker
     
     %% Fluxo de Processamento
     Worker -- Download Video --> S3
     Worker -- Status Atualização (REST) --> WebAPI
-    Worker -- Processamento (FFmpeg) --> Worker
+    Worker -- "Processamento (FFmpeg)" --> Worker
     Worker -- "Msg: video.processed" --> RabbitMQ
     
     %% Fluxo de Notificação
