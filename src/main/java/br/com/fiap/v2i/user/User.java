@@ -15,6 +15,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true, unique = true)
+    private String email;
+
     protected User() {
     }
 
@@ -23,8 +26,18 @@ public class User {
         this.password = password;
     }
 
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
     public static User create(String username, String encodedPassword) {
         return new User(username, encodedPassword);
+    }
+
+    public static User create(String username, String encodedPassword, String email) {
+        return new User(username, encodedPassword, email);
     }
 
     public Long getId() {
@@ -37,5 +50,13 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

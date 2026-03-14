@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
@@ -26,14 +27,23 @@ public class S3Config {
     @Value("${aws.s3.endpoint}")
     private String endpoint;
 
+    private StaticCredentialsProvider credentialsProvider() {
+        return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey));
+    }
+
     @Bean
     public S3Client s3Client() {
         Region awsRegion = Region.of(region);
-        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
         return S3Client.builder()
                 .region(awsRegion)
                 .endpointOverride(URI.create(endpoint))
-                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .credentialsProvider(credentialsProvider())
+                .serviceConfiguration(S3Configuration.builder()
+                        // LocalStack funciona melhor com path-style: http://localhost:4566/bucket/key
+                        .pathStyleAccessEnabled(true)
+                        // evita problemas de assinatura/streaming em alguns setups do localstack
+                        .chunkedEncodingEnabled(false)
+                        .build())
                 .build();
     }
 
@@ -43,8 +53,11 @@ public class S3Config {
         return S3Presigner.builder()
                 .region(awsRegion)
                 .endpointOverride(URI.create(endpoint))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKeyId, secretAccessKey)))
+                .credentialsProvider(credentialsProvider())
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .chunkedEncodingEnabled(false)
+                        .build())
                 .build();
     }
 }
