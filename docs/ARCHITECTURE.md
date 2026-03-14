@@ -19,15 +19,15 @@ graph TD
         Ingress[Load Balancer / Ingress]
         
         subgraph "V2I Web (API Gateway logic)"
-            WebAPI[v2i-web:8000]
+            WebAPI[v2i-web:30001]
         end
         
         subgraph "V2I Processing"
-            Worker[v2i-processing:8001]
+            Worker[v2i-processing:30002]
         end
         
         subgraph "V2I Notification"
-            Notif[v2i-notification:8003]
+            Notif[v2i-notification:30003]
         end
     end
 
@@ -51,8 +51,7 @@ graph TD
     WebAPI -- Metadados (Pendente) --> Postgres
     
     %% Fluxo de Trigger (Event Driven)
-    S3 -.-> |Evento Upload| Lambda
-    Lambda -- "POST /extract-frames" --> Worker
+    S3 -.-> |Evento Upload|
     
     %% Fluxo de Processamento
     Worker -- Download Video --> S3
@@ -69,7 +68,7 @@ graph TD
 ## 3. Microsserviços
 
 ### 3.1. V2I Web (`v2i-web`)
-*   **Porta:** `8000`
+*   **Porta:** `30001`
 *   **Responsabilidade:** Interface principal com o usuário e gerenciamento de metadados.
 *   **Fluxo:**
     1.  Recebe o vídeo do usuário.
@@ -78,9 +77,9 @@ graph TD
     4.  Fornece endpoints para que o processador atualize o status do vídeo (`PROCESSING`, `SUCCESS`, `ERROR`).
 
 ### 3.2. V2I Processing (`v2i-processing`)
-*   **Porta:** `8001`
+*   **Porta:** `30002`
 *   **Responsabilidade:** Core de processamento de vídeo.
-*   **Acionamento:** É acionado via **Webhook/REST** (padrão atual via Lambda/S3 Event) quando um novo arquivo chega no S3.
+*   **Acionamento:** É acionado via **Webhook/REST** (S3 Event) quando um novo arquivo chega no S3.
 *   **Fluxo:**
     1.  Recebe notificação de novo arquivo.
     2.  Notifica `v2i-web` que o processamento iniciou.
@@ -91,7 +90,7 @@ graph TD
     7.  Publica mensagem `video.processed` no **RabbitMQ** para fins de notificação.
 
 ### 3.3. V2I Notification (`v2i-notification`)
-*   **Porta:** `8003`
+*   **Porta:** `30003`
 *   **Responsabilidade:** Serviço dedicado a comunicar o usuário final sobre a conclusão do processamento.
 *   **Principais Funcionalidades:**
     *   Escuta eventos de finalização de processamento.
