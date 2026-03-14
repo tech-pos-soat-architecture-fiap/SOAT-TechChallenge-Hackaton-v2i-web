@@ -49,9 +49,11 @@ graph TD
     %% Fluxo de Upload
     WebAPI -- Upload Video --> S3
     WebAPI -- Metadados (Pendente) --> Postgres
+    WebAPI -- "Evento: Iniciar Processamento" --> RabbitMQ
     
-    %% Fluxo de Trigger (Event Driven) - LINHA CORRIGIDA ABAIXO
+    %% Fluxo de Trigger (Event Driven)
     S3 -.-> |Evento Upload| Worker
+    RabbitMQ -- "video-processing-queue" --> Worker
     
     %% Fluxo de Processamento
     Worker -- Download Video --> S3
@@ -74,14 +76,15 @@ graph TD
     1.  Recebe o vídeo do usuário.
     2.  Salva os metadados no PostgreSQL (Status: `PENDING`).
     3.  Realiza o upload do arquivo binário para o Bucket S3 (`v2i-bucket`).
-    4.  Fornece endpoints para que o processador atualize o status do vídeo (`PROCESSING`, `SUCCESS`, `ERROR`).
+    4.  Publica evento de processamento no RabbitMQ.
+    5.  Fornece endpoints para que o processador atualize o status do vídeo (`PROCESSING`, `SUCCESS`, `ERROR`).
 
 ### 3.2. V2I Processing (`v2i-processing`)
 *   **Porta:** `30002`
 *   **Responsabilidade:** Core de processamento de vídeo.
 *   **Acionamento:** É acionado via **Webhook/REST** (S3 Event) quando um novo arquivo chega no S3.
 *   **Fluxo:**
-    1.  Recebe notificação de novo arquivo.
+    1.  Recebe notificação de novo evento de processamento do RabbitMQ.
     2.  Notifica `v2i-web` que o processamento iniciou.
     3.  Baixa o vídeo do S3.
     4.  Extrai frames do vídeo (gera imagens).
