@@ -1,132 +1,521 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Upload to S3</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>V2I - Upload & Status</title>
     <style>
+        :root {
+            --bg: #0b1020;
+            --panel: rgba(255,255,255,0.06);
+            --panel2: rgba(255,255,255,0.10);
+            --text: #e7e9ee;
+            --muted: rgba(231,233,238,0.7);
+            --brand: #7c5cff;
+            --ok: #2dd4bf;
+            --warn: #fbbf24;
+            --err: #fb7185;
+            --border: rgba(255,255,255,0.14);
+        }
+
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: radial-gradient(1200px 600px at 15% 10%, rgba(124,92,255,0.35), transparent 60%),
+                        radial-gradient(1000px 500px at 85% 20%, rgba(45,212,191,0.22), transparent 55%),
+                        var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            padding: 28px 18px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
         }
-        .container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 0.5px;
         }
+
+        .pill {
+            font-size: 12px;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 18px 40px;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 980px) {
+            main { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
         label {
+            font-size: 12px;
+            color: var(--muted);
             display: block;
-            margin-bottom: 5px;
+            margin: 10px 0 6px;
         }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
+
+        input[type="text"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.25);
+            color: var(--text);
+            outline: none;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(124,92,255,0.55);
+            background: linear-gradient(180deg, rgba(124,92,255,0.9), rgba(124,92,255,0.65));
             color: white;
-            border: none;
-            border-radius: 3px;
+            font-weight: 600;
             cursor: pointer;
         }
-        button:disabled {
-            background-color: #ccc;
+
+        .btn.secondary {
+            border-color: var(--border);
+            background: rgba(255,255,255,0.06);
         }
-        #status {
-            margin-top: 20px;
-            padding: 10px;
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.25);
+            color: var(--muted);
             display: none;
+            white-space: pre-wrap;
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
+
+        .status.ok { color: rgba(45,212,191,1); border-color: rgba(45,212,191,0.4); }
+        .status.err { color: rgba(251,113,133,1); border-color: rgba(251,113,133,0.45); }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
+
+        .toolbar .btn {
+            width: auto;
+            margin: 0;
+            padding: 8px 10px;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        th, td {
+            padding: 10px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        th {
+            text-align: left;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.15);
+        }
+
+        .badge.processing { border-color: rgba(251,191,36,0.5); color: rgba(251,191,36,1); }
+        .badge.completed { border-color: rgba(45,212,191,0.5); color: rgba(45,212,191,1); }
+        .badge.error { border-color: rgba(251,113,133,0.6); color: rgba(251,113,133,1); }
+        .badge.uploaded { border-color: rgba(124,92,255,0.55); color: rgba(124,92,255,1); }
+
+        .muted { color: var(--muted); }
+
+        a { color: rgba(45,212,191,1); }
+        a:hover { opacity: 0.9; }
+
+        .small { font-size: 12px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Upload Video</h1>
-        <div class="form-group">
-            <label for="videoFile">Select Video File:</label>
-            <input type="file" id="videoFile" accept="video/*">
-        </div>
-        <button id="uploadBtn" onclick="uploadFile()">Upload</button>
-        <div id="status"></div>
+<header>
+    <div class="title">
+        <h1>Upload e status</h1>
     </div>
+</header>
 
-    <script>
-        async function uploadFile() {
-            const fileInput = document.getElementById('videoFile');
-            const uploadBtn = document.getElementById('uploadBtn');
+<main>
+    <section class="card">
+        <h2>Autenticação</h2>
+        <label>Usuário</label>
+        <input id="username" type="text" placeholder="ex.: joao" autocomplete="username" />
 
-            if (fileInput.files.length === 0) {
-                showStatus('Please select a file first.', 'error');
-                return;
-            }
+        <label>Senha</label>
+        <input id="password" type="password" placeholder="sua senha" autocomplete="current-password" />
 
-            const file = fileInput.files[0];
-            uploadBtn.disabled = true;
-            showStatus('Getting presigned URL...', 'success');
+        <div class="row">
+            <button class="btn secondary" onclick="saveCreds()">Logar</button>
+        </div>
+        <div id="authStatus" class="status"></div>
 
-            try {
-                // 1. Get Presigned URL
-                const initiateResponse = await fetch('/api/video/upload', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        filename: file.name,
-                        contentType: file.type,
-                        fileSize: file.size
-                    })
-                });
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.12); margin:16px 0;">
 
-                if (!initiateResponse.ok) {
-                    throw new Error('Failed to get upload URL');
-                }
+        <h2>Upload</h2>
+        <label>Selecionar vídeo</label>
+        <input id="videoFile" type="file" accept="video/*" />
+        <button id="uploadBtn" class="btn" onclick="uploadAndConfirm()">Enviar e processar</button>
+        <div id="uploadStatus" class="status"></div>
+    </section>
 
-                const data = await initiateResponse.json();
-                const uploadUrl = data.uploadUrl;
+    <section class="card">
+        <div class="toolbar">
+            <h2 style="margin:0;">Meus vídeos</h2>
+            <div class="row">
+                <button class="btn secondary" onclick="refreshStatus()">Atualizar</button>
+                <button class="btn secondary" onclick="toggleAutoRefresh()" id="autoBtn">Auto: off</button>
+            </div>
+        </div>
 
-                showStatus('Uploading to S3...', 'success');
-                console.log('Presigned URL:', uploadUrl);
+        <div class="small muted" style="margin-bottom:10px;">
+            Lista de status via <code>/api/video/status</code>. Clique em “Download” quando estiver COMPLETED.
+        </div>
 
-                // 2. Upload to S3
-                const uploadResponse = await fetch(uploadUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': file.type
-                    },
-                    body: file
-                });
+        <div style="overflow:auto; border-radius:12px; border: 1px solid rgba(255,255,255,0.10);">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Arquivo</th>
+                    <th>Status</th>
+                    <th>Detalhes</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody id="videosTbody">
+                <tr><td colspan="5" class="muted">Nenhum dado carregado.</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-                if (uploadResponse.ok) {
-                    showStatus('Upload successful! Key: ' + data.key, 'success');
-                } else {
-                    throw new Error('Failed to upload to S3');
-                }
+        <div id="listStatus" class="status" style="display:none"></div>
+    </section>
+</main>
 
-            } catch (error) {
-                console.error('Error:', error);
-                showStatus('Error: ' + error.message, 'error');
-            } finally {
-                uploadBtn.disabled = false;
-            }
+<script>
+    document.addEventListener('DOMContentLoaded', refreshStatus);
+    const storageKey = 'v2i_basic_creds';
+    let autoTimer = null;
+
+    function show(elId, message, type) {
+        const el = document.getElementById(elId);
+        el.textContent = message;
+        el.className = 'status ' + (type || '');
+        el.style.display = 'block';
+    }
+
+    function hide(elId) {
+        const el = document.getElementById(elId);
+        el.style.display = 'none';
+    }
+
+    function basicAuthHeader() {
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        if (!user || !pass) return null;
+        const token = btoa(user + ':' + pass);
+        return 'Basic ' + token;
+    }
+
+    function saveCreds() {
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        if (!user || !pass) {
+            show('authStatus', 'Informe usuário e senha antes de salvar.', 'err');
+            return;
+        }
+        localStorage.setItem(storageKey, JSON.stringify({ user, pass }));
+        show('authStatus', 'Credenciais salvas no navegador (Basic Auth).', 'ok');
+    }
+
+    function clearCreds() {
+        localStorage.removeItem(storageKey);
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        show('authStatus', 'Credenciais removidas.', 'ok');
+    }
+
+    function loadCreds() {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+        try {
+            const { user, pass } = JSON.parse(raw);
+            if (user) document.getElementById('username').value = user;
+            if (pass) document.getElementById('password').value = pass;
+        } catch {
+            // ignore
+        }
+    }
+
+    function badgeClass(status) {
+        const s = (status || '').toUpperCase();
+        if (s === 'PROCESSING') return 'processing';
+        if (s === 'COMPLETED') return 'completed';
+        if (s === 'ERROR') return 'error';
+        return 'uploaded';
+    }
+
+    async function refreshStatus() {
+        hide('listStatus');
+
+        const auth = basicAuthHeader();
+        if (!auth) {
+            show('listStatus', 'Informe usuário e senha para listar seus vídeos.', 'err');
+            return;
         }
 
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('status');
-            statusDiv.textContent = message;
-            statusDiv.className = type;
-            statusDiv.style.display = 'block';
+        const res = await fetch('/api/video/status', {
+            headers: { 'Authorization': auth }
+        });
+
+        if (res.status === 401) {
+            show('listStatus', 'Não autorizado (401). Verifique usuário/senha.', 'err');
+            return;
         }
-    </script>
+
+        if (!res.ok) {
+            show('listStatus', 'Erro ao carregar status: HTTP ' + res.status, 'err');
+            return;
+        }
+
+        const list = await res.json();
+        const tbody = document.getElementById('videosTbody');
+        tbody.innerHTML = '';
+
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="muted">Nenhum vídeo encontrado.</td></tr>';
+            return;
+        }
+
+        for (const v of list) {
+            const status = (v.status || '').toUpperCase();
+            const details = v.errorMessage ? ('Erro: ' + v.errorMessage) : (v.downloadUrl ? 'Pronto para download' : '...');
+
+            let actions = '';
+            if (status === 'COMPLETED') {
+                // /api/video/download/{id} exige Basic Auth e retorna a presigned URL.
+                actions += `<a href="#" onclick="downloadZip(${v.id}); return false;">Download</a>`;
+            } else {
+                actions += '<span class="muted">—</span>';
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${v.id ?? ''}</td>
+                <td>${escapeHtml(v.fileName ?? '')}<div class="muted small">${escapeHtml(v.fileHash ?? '')}</div></td>
+                <td><span class="badge ${badgeClass(status)}">${escapeHtml(status)}</span></td>
+                <td class="muted">${escapeHtml(details)}</td>
+                <td>${actions}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    async function downloadZip(videoId) {
+        const auth = basicAuthHeader();
+        if (!auth) {
+            show('listStatus', 'Informe usuário e senha para baixar.', 'err');
+            return;
+        }
+
+        const res = await fetch('/api/video/download/' + videoId, {
+            headers: { 'Authorization': auth }
+        });
+
+        if (res.status === 401) {
+            show('listStatus', 'Não autorizado (401). Verifique usuário/senha.', 'err');
+            return;
+        }
+        if (!res.ok) {
+            show('listStatus', 'Erro ao obter link de download: HTTP ' + res.status, 'err');
+            return;
+        }
+
+        const presignedUrl = await res.text();
+        window.open(presignedUrl, '_blank');
+    }
+
+    async function uploadAndConfirm() {
+        const auth = basicAuthHeader();
+        if (!auth) {
+            show('uploadStatus', 'Informe usuário e senha para fazer upload.', 'err');
+            return;
+        }
+
+        const fileInput = document.getElementById('videoFile');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            show('uploadStatus', 'Selecione um arquivo de vídeo.', 'err');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const btn = document.getElementById('uploadBtn');
+        btn.disabled = true;
+
+        try {
+            show('uploadStatus', '1/3: Solicitando URL de upload...', 'ok');
+            const initRes = await fetch('/api/video/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': auth
+                },
+                body: JSON.stringify({
+                    filename: file.name,
+                    contentType: file.type || 'application/octet-stream',
+                    fileSize: file.size
+                })
+            });
+
+            if (initRes.status === 401) {
+                throw new Error('Não autorizado (401). Verifique usuário/senha.');
+            }
+            if (!initRes.ok) {
+                throw new Error('Falha ao iniciar upload. HTTP ' + initRes.status);
+            }
+
+            const init = await initRes.json();
+            const uploadUrl = init.uploadUrl;
+            const fileHash = init.key;
+
+            show('uploadStatus', '2/3: Enviando arquivo para o S3...', 'ok');
+            const putRes = await fetch(uploadUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': file.type || 'application/octet-stream' },
+                body: file
+            });
+
+            if (!putRes.ok) {
+                throw new Error('Falha no PUT para o S3. HTTP ' + putRes.status);
+            }
+
+            show('uploadStatus', '3/3: Confirmando upload e criando job na fila...', 'ok');
+            const confirmRes = await fetch('/api/video/upload/confirm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': auth
+                },
+                body: JSON.stringify({ fileHash })
+            });
+
+            if (confirmRes.status === 401) {
+                throw new Error('Não autorizado (401) ao confirmar upload.');
+            }
+            if (!confirmRes.ok) {
+                throw new Error('Falha ao confirmar upload. HTTP ' + confirmRes.status);
+            }
+
+            show('uploadStatus', 'Upload confirmado. O processamento foi enfileirado. Atualize a lista para acompanhar.', 'ok');
+            await refreshStatus();
+
+        } catch (e) {
+            show('uploadStatus', String(e?.message || e), 'err');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function toggleAutoRefresh() {
+        const btn = document.getElementById('autoBtn');
+        if (autoTimer) {
+            clearInterval(autoTimer);
+            autoTimer = null;
+            btn.textContent = 'Auto: off';
+            return;
+        }
+        autoTimer = setInterval(refreshStatus, 5000);
+        btn.textContent = 'Auto: on';
+        refreshStatus();
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    loadCreds();
+</script>
 </body>
 </html>

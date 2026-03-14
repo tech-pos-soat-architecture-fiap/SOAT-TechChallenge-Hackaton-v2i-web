@@ -27,7 +27,8 @@ class UserControllerTest {
 
         UserRegistrationDTO dto = new UserRegistrationDTO(
                 "maria",
-                "123456"
+                "123456",
+                "maria@example.com"
         );
 
         ResponseEntity<String> response = controller.register(dto);

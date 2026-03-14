@@ -17,6 +17,12 @@ public class Video {
     @Enumerated(EnumType.STRING)
     private VideoStatus status;
 
+    @Column(nullable = true)
+    private String downloadUrl;
+
+    @Column(nullable = true)
+    private String errorMessage;
+
     @Deprecated
     public Video() {
     }
@@ -48,6 +54,14 @@ public class Video {
         return status;
     }
 
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
     public static Video createAsUploaded(User user, String fileName, String fileHash) {
         return new Video(user, fileName, fileHash, VideoStatus.UPLOADED);
     }
@@ -56,11 +70,14 @@ public class Video {
         this.status = VideoStatus.PROCESSING;
     }
 
-    public void markAsComplete() {
+    public void markAsComplete(String downloadUrl) {
         this.status = VideoStatus.COMPLETED;
+        this.downloadUrl = downloadUrl;
+        this.errorMessage = null;
     }
 
-    public void markAsError() {
+    public void markAsError(String errorMessage) {
         this.status = VideoStatus.ERROR;
+        this.errorMessage = errorMessage;
     }
 }
