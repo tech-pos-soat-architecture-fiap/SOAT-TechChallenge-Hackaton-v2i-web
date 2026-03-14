@@ -35,7 +35,6 @@ graph TD
         Postgres[(PostgreSQL)]
         RabbitMQ((RabbitMQ))
         S3[AWS S3 / LocalStack]
-        Lambda[AWS Lambda / Trigger]
     end
     
     subgraph "Serviços Externos"
